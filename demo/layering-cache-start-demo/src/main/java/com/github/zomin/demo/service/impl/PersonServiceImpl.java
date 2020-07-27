@@ -1,6 +1,5 @@
 package com.github.zomin.demo.service.impl;
 
-import com.github.zomin.annotation.*;
 import com.github.zomin.demo.entity.Person;
 import com.github.zomin.demo.service.PersonService;
 import org.slf4j.Logger;
