@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>layering-cache</artifactId>
-        <groupId>com.github.xiaolyuh</groupId>
-        <version>2.0.8</version>
+        <groupId>com.github.zomin</groupId>
+        <version>1.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,9 +16,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.xiaolyuh</groupId>
+            <groupId>com.github.zomin</groupId>
             <artifactId>layering-cache-core</artifactId>
-            <version>2.0.8</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -30,11 +30,18 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -66,18 +73,6 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo-shaded</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
