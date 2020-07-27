@@ -1,6 +1,7 @@
 package com.github.zomin.cache.config;
 
 import com.github.zomin.aspect.LayeringAspect;
+import com.github.zomin.cache.LayeringCacheUtils;
 import com.github.zomin.cache.properties.LayeringCacheProperties;
 import com.github.zomin.manager.CacheManager;
 import com.github.zomin.manager.LayeringCacheManager;
@@ -45,5 +46,8 @@ public class LayeringCacheAutoConfig {
     public LayeringAspect layeringAspect() {
         return new LayeringAspect();
     }
+
+    @Bean
+    public LayeringCacheUtils layeringCacheUtils() {return new LayeringCacheUtils();}
 
 }

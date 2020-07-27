@@ -9,11 +9,9 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -1416,6 +1414,18 @@ public class RedisUtils {
     }
 
     /**
+     *
+     * @param key key
+     * @param item item
+     * @param value value
+     * @return boolean true
+     */
+    public boolean hPutForObject(String key, String item, Object value) {
+        redisTemplate.opsForHash().put(key, item, value);
+        return true;
+    }
+
+    /**
      * runLua 执行lua脚本
      *
      * @param fileClasspath lua脚本Classpath 与 application.properties
@@ -1430,60 +1440,6 @@ public class RedisUtils {
         redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource(fileClasspath)));
         redisScript.setResultType(returnType);
         return redisTemplate.execute(redisScript,keys,values);
-    }
-
-    /**
-     * 批量写入redis
-     *
-     * @param keys   键集合
-     * @param values 值集合
-     * @param timeout 有效时间
-     *
-     * @return Boolean 是否成功
-     */
-    public Boolean batchAdd(List keys, List values, Long timeout) {
-        if (CollectionUtils.isEmpty(keys)) {
-            return false;
-        }
-        values.add(0,timeout);
-        return (Boolean) runLua("/lua/batchAdd.lua", Boolean.class, keys, values.toArray());
-    }
-
-    /**
-     * 批量查询redis
-     * @param keys keys
-     *
-     * @return List 集合
-     */
-    public List batchGet(List keys) {
-        if(CollectionUtils.isEmpty(keys)){
-            return Collections.EMPTY_LIST;
-        }
-        Integer count = 0;
-        List list = (List) runLua("/lua/batchGet.lua", List.class, keys);
-        for (Object o : list) {
-            if (Objects.isNull(o)) {
-                count ++;
-            }
-        }
-        if (count.equals(list.size())) {
-            return null;
-        }
-        return list;
-    }
-
-    /**
-     * 批量写入redis
-     *
-     * @param keys   键集合
-     *
-     * @return 是否成功
-     */
-    public Boolean batchDelete(List keys) {
-        if (CollectionUtils.isEmpty(keys)) {
-            return false;
-        }
-        return (Boolean) runLua("/lua/batchDelete.lua", Boolean.class, keys);
     }
 
 }

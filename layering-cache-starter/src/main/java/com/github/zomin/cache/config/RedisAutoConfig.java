@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.zomin.redis.serializer.RedisKeySerializer;
+import com.github.zomin.redis.utils.RedisUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -171,5 +172,10 @@ public class RedisAutoConfig extends CachingConfigurerSupport {
         template.setHashValueSerializer(redisSerializer);
         template.afterPropertiesSet();
         return template;
+    }
+
+    @Bean
+    public RedisUtils redisUtils() {
+        return new RedisUtils();
     }
 }
