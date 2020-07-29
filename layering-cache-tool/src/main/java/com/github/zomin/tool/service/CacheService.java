@@ -85,20 +85,33 @@ public class CacheService {
      *
      * @return HashMap<String,Object> 集合
      */
-    public HashMap<String,Object> findAllCache() {
+    public HashMap<String,Object> findAllCache(String cacheName) {
         HashMap<String,Object> cacheMap = new HashMap<>(16);
-        Set<AbstractCacheManager> cacheManagers = AbstractCacheManager.getCacheManager();
-        for (AbstractCacheManager cacheManager : cacheManagers) {
-            Set<String> keySet = cacheManager.getCacheContainer().keySet();
-            for (String tempKey : keySet) {
-                ConcurrentMap<String,Cache> cacheConcurrentMap = cacheManager.getCacheContainer().get(tempKey);
-                for (String tempCacheKey : cacheConcurrentMap.keySet()){
-                    LayeringCache lc = (LayeringCache)cacheConcurrentMap.get(tempCacheKey);
-                    ConcurrentMap cm = ((CaffeineCache) lc.getFirstCache()).getNativeCache().asMap();
-                    Set<Long> cmKeyset = cm.keySet();
-                    for (Long cmKey : cmKeyset) {
-                        Object value = cm.get(cmKey);
-                        cacheMap.put(tempKey, value);
+        if(StringUtils.isNotBlank(cacheName)) {
+            Set<AbstractCacheManager> cacheManagers = AbstractCacheManager.getCacheManager();
+            for (AbstractCacheManager cacheManager : cacheManagers) {
+                Collection<Cache> caches = cacheManager.getCache(cacheName);
+                if(!CollectionUtils.isEmpty(caches)) {
+                    for (Cache cache : caches) {
+                        Object value = cache.get(cacheName);
+                        cacheMap.put(cacheName, value);
+                    }
+                }
+            }
+        } else {
+            Set<AbstractCacheManager> cacheManagers = AbstractCacheManager.getCacheManager();
+            for (AbstractCacheManager cacheManager : cacheManagers) {
+                Set<String> keySet = cacheManager.getCacheContainer().keySet();
+                for (String tempKey : keySet) {
+                    ConcurrentMap<String,Cache> cacheConcurrentMap = cacheManager.getCacheContainer().get(tempKey);
+                    for (String tempCacheKey : cacheConcurrentMap.keySet()){
+                        LayeringCache lc = (LayeringCache)cacheConcurrentMap.get(tempCacheKey);
+                        ConcurrentMap cm = ((CaffeineCache) lc.getFirstCache()).getNativeCache().asMap();
+                        Set<String> cmKeyset = cm.keySet();
+                        for (String cmKey : cmKeyset) {
+                            Object value = cm.get(cmKey);
+                            cacheMap.put(tempKey, value);
+                        }
                     }
                 }
             }

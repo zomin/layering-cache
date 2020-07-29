@@ -1,6 +1,7 @@
 package com.github.zomin.tool.support;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * 与前端交互对象
@@ -11,14 +12,18 @@ public class Result<T> implements Serializable {
 
     private static final long serialVersionUID = 5925101851082556646L;
     private T data;
-    private Status status;
+    private String requestId;
     private String code;
     private String message;
+
+    public Result() {
+        this.requestId = UUID.randomUUID().toString();
+    }
+
 
     public static Result success() {
         Result result = new Result<>();
         result.setCode("200");
-        result.setStatus(Status.SUCCESS);
         result.setMessage(Status.SUCCESS.name());
         return result;
     }
@@ -26,7 +31,6 @@ public class Result<T> implements Serializable {
     public static <T> Result success(T data) {
         Result<T> result = new Result<>();
         result.setCode("200");
-        result.setStatus(Status.SUCCESS);
         result.setMessage(Status.SUCCESS.name());
         result.setData(data);
         return result;
@@ -35,7 +39,6 @@ public class Result<T> implements Serializable {
     public static <T> Result error(String msg) {
         Result<T> result = new Result<>();
         result.setCode("500");
-        result.setStatus(Status.ERROR);
         result.setMessage(msg);
         return result;
     }
@@ -64,12 +67,12 @@ public class Result<T> implements Serializable {
         this.message = message;
     }
 
-    public Status getStatus() {
-        return status;
+    public String getRequestId() {
+        return requestId;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
     public static enum Status {

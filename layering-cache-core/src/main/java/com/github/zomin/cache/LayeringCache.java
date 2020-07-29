@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.util.ObjectUtils;
 
 import java.util.concurrent.Callable;
 
@@ -96,7 +97,9 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         }
         if (result == null) {
             result = secondCache.get(key);
-            firstCache.putIfAbsent(key, result);
+            if(useFirstCache) {
+                firstCache.put(key, result);
+            }
             if(logger.isDebugEnabled()) {
                 logger.debug("查询二级缓存,并将数据放到一级缓存。 key={},返回值是:{}", key, JSON.toJSONString(result));
             }
@@ -117,7 +120,9 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         }
 
         T result = secondCache.get(key, type);
-        firstCache.putIfAbsent(key, result);
+        if (useFirstCache) {
+            firstCache.putIfAbsent(key, result);
+        }
         if(logger.isDebugEnabled()) {
             logger.debug("查询二级缓存,并将数据放到一级缓存。 key={},返回值是:{}", key, JSON.toJSONString(result));
         }
@@ -136,7 +141,9 @@ public class LayeringCache extends AbstractValueAdaptingCache {
             }
         }
         T result = secondCache.get(key, valueLoader);
-        firstCache.putIfAbsent(key, result);
+        if (useFirstCache) {
+            firstCache.putIfAbsent(key, result);
+        }
         if(logger.isDebugEnabled()) {
             logger.debug("查询二级缓存,并将数据放到一级缓存。 key={},返回值是:{}", key, JSON.toJSONString(result));
         }
@@ -179,6 +186,22 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         if (useFirstCache) {
             clearFirstCache();
         }
+    }
+
+    /**
+     * 需要强制刷新本地缓存
+     * @param key key
+     * @return Object value
+     */
+    public Object pushFirstCache(Object key) {
+        Object result = secondCache.get(key);
+        // 强制同步一级缓存
+        if(!ObjectUtils.isEmpty(result)) {
+            if (useFirstCache) {
+                updateFirstCache(key);
+            }
+        }
+        return result;
     }
 
     private void deleteFirstCache(Object key) {

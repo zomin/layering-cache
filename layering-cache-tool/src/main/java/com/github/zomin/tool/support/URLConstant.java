@@ -6,8 +6,6 @@ package com.github.zomin.tool.support;
  * @author yuhao.wang3
  */
 public class URLConstant {
-
-
     /**
      * 重置缓存统计数据
      */

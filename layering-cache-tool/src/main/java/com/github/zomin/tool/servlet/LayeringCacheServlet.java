@@ -53,7 +53,7 @@ public class LayeringCacheServlet extends HttpServlet {
         if (contextPath == null) {
             contextPath = "";
         }
-        String uri = contextPath + servletPath;
+
         String path = requestURI.substring(contextPath.length() + servletPath.length());
 
         // 重置缓存统计数据
@@ -93,8 +93,10 @@ public class LayeringCacheServlet extends HttpServlet {
 
         //查询所有缓存
         if(URLConstant.CACHE_FIND_ALL_CACHW.equals(path)) {
-            HashMap<String,Object> cacheMap = BeanFactory.getBean(CacheService.class).findAllCache();
-            response.getWriter().write(JSON.toJSONString(Result.success(JSON.toJSONString(cacheMap))));
+            String cacheNameParam = request.getParameter("cacheName");
+            HashMap<String,Object> cacheMap = BeanFactory.getBean(CacheService.class).findAllCache(cacheNameParam);
+            response.getWriter().write(JSON.toJSONString(Result.success(cacheMap)));
+            return;
         }
     }
 
