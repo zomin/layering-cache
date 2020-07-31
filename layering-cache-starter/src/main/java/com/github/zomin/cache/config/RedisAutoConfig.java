@@ -27,6 +27,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.time.Duration;
+import java.util.TimeZone;
 
 /**
  * @author Kalend
@@ -62,7 +63,7 @@ public class RedisAutoConfig extends CachingConfigurerSupport {
     private long maxWaitMillis;
     @Value("${redis.generic.pool.soft-min-evictable-idle-timemillis:50000}")
     private long softMinEvictableIdleTimeMillis;
-    @Value("${redis.generic..test-on-borrow:false}")
+    @Value("${redis.generic.pool.test-on-borrow:false}")
     private boolean testOnBorrow;
     @Value("${redis.generic.pool.test-on-return:false}")
     private boolean testOnReturn;
@@ -138,6 +139,7 @@ public class RedisAutoConfig extends CachingConfigurerSupport {
         ObjectMapper om = new ObjectMapper();
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        om.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         om.registerModule(new JavaTimeModule());
         //防止 BigDecimal转化时出现精度丢失
         om.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
