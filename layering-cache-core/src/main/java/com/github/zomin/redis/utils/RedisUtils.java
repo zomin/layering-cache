@@ -214,7 +214,15 @@ public class RedisUtils {
     public void set(String key, String value) {
         redisTemplate.opsForValue().set(key, value);
     }
-
+    /**
+     * 设置指定 key 的值
+     *
+     * @param key   redis key
+     * @param value value
+     */
+    public void setObject(String key, Object value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
     /**
      * 获取指定 key 的值
      *
@@ -229,7 +237,20 @@ public class RedisUtils {
         }
         return String.valueOf(objByRedis);
     }
-
+    /**
+     * 获取指定 key 的值
+     *
+     * @param key redis key
+     *
+     * @return String value
+     */
+    public Object getObject(String key) {
+        Object objByRedis = redisTemplate.opsForValue().get(key);
+        if (Objects.isNull(objByRedis)) {
+            return null;
+        }
+        return objByRedis;
+    }
     /**
      * 返回 key 中字符串值的子字符
      *
