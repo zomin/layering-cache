@@ -277,6 +277,19 @@ public class RedisUtils {
     }
 
     /**
+     * 将给定 key 的值设为 value ，并返回 key 的旧值(old value)
+     *
+     * @param key   redis key
+     * @param value value
+     *
+     * @return value
+     */
+    public String getAndSetObject(String key, Object value) {
+        return String.valueOf(redisTemplate.opsForValue().getAndSet(key, value));
+    }
+
+
+    /**
      * 对 key 所储存的字符串值，获取指定偏移量上的位(bit)
      *
      * @param key    redis key
@@ -338,6 +351,18 @@ public class RedisUtils {
     }
 
     /**
+     * 只有在 key 不存在时设置 key 的值
+     *
+     * @param key   key
+     * @param value value
+     *
+     * @return 之前已经存在返回false, 不存在返回true
+     */
+    public boolean setObjectIfAbsent(String key, Object value) {
+        return redisTemplate.opsForValue().setIfAbsent(key, value);
+    }
+
+    /**
      * 用 value 参数覆写给定 key 所储存的字符串值，从偏移量 offset 开始
      *
      * @param key    key
@@ -345,6 +370,17 @@ public class RedisUtils {
      * @param offset 从指定位置开始覆写
      */
     public void setRange(String key, String value, long offset) {
+        redisTemplate.opsForValue().set(key, value, offset);
+    }
+
+    /**
+     * 用 value 参数覆写给定 key 所储存的字符串值，从偏移量 offset 开始
+     *
+     * @param key    key
+     * @param value  value
+     * @param offset 从指定位置开始覆写
+     */
+    public void setObjectRange(String key, Object value, long offset) {
         redisTemplate.opsForValue().set(key, value, offset);
     }
 
@@ -369,6 +405,15 @@ public class RedisUtils {
     }
 
     /**
+     * 批量添加
+     *
+     * @param maps map
+     */
+    public void multiSetObject(Map<String, Object> maps) {
+        redisTemplate.opsForValue().multiSet(maps);
+    }
+
+    /**
      * 同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在
      *
      * @param maps map
@@ -376,6 +421,17 @@ public class RedisUtils {
      * @return 之前已经存在返回false, 不存在返回true
      */
     public boolean multiSetIfAbsent(Map<String, String> maps) {
+        return redisTemplate.opsForValue().multiSetIfAbsent(maps);
+    }
+
+    /**
+     * 同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在
+     *
+     * @param maps map
+     *
+     * @return 之前已经存在返回false, 不存在返回true
+     */
+    public boolean multiSetObjectIfAbsent(Map<String, Object> maps) {
         return redisTemplate.opsForValue().multiSetIfAbsent(maps);
     }
 
@@ -454,8 +510,28 @@ public class RedisUtils {
         redisTemplate.opsForHash().put(key, hashKey, value);
     }
 
+    public void hPutObject(String key, String hashKey, Object value) {
+        redisTemplate.opsForHash().put(key, hashKey, value);
+    }
+
     public void hPutAll(String key, Map<String, String> maps) {
         redisTemplate.opsForHash().putAll(key, maps);
+    }
+
+    public void hPutAllObject(String key, Map<String, Object> maps) {
+        redisTemplate.opsForHash().putAll(key, maps);
+    }
+    /**
+     * 仅当hashKey不存在时才设置
+     *
+     * @param key     key
+     * @param hashKey hashKey
+     * @param value   value
+     *
+     * @return Boolean
+     */
+    public Boolean hPutIfAbsent(String key, String hashKey, String value) {
+        return redisTemplate.opsForHash().putIfAbsent(key, hashKey, value);
     }
 
     /**
@@ -467,7 +543,7 @@ public class RedisUtils {
      *
      * @return Boolean
      */
-    public Boolean hPutIfAbsent(String key, String hashKey, String value) {
+    public Boolean hPutObjectIfAbsent(String key, String hashKey, Object value) {
         return redisTemplate.opsForHash().putIfAbsent(key, hashKey, value);
     }
 
@@ -581,6 +657,18 @@ public class RedisUtils {
     }
 
     /**
+     * 存储在list头部
+     *
+     * @param key   key
+     * @param value value
+     *
+     * @return Long
+     */
+    public Long lLeftPushObject(String key, Object value) {
+        return redisTemplate.opsForList().leftPush(key, value);
+    }
+
+    /**
      * @param key   key
      * @param value value
      *
@@ -596,7 +684,27 @@ public class RedisUtils {
      *
      * @return Long
      */
+    public Long lLeftPushAllObject(String key, Object... value) {
+        return redisTemplate.opsForList().leftPushAll(key, value);
+    }
+
+    /**
+     * @param key   key
+     * @param value value
+     *
+     * @return Long
+     */
     public Long lLeftPushAll(String key, Collection<String> value) {
+        return redisTemplate.opsForList().leftPushAll(key, value);
+    }
+
+    /**
+     * @param key   key
+     * @param value value
+     *
+     * @return Long
+     */
+    public Long lLeftPushAllObject(String key, Collection<Object> value) {
         return redisTemplate.opsForList().leftPushAll(key, value);
     }
 
@@ -613,6 +721,18 @@ public class RedisUtils {
     }
 
     /**
+     * 当list存在的时候才加入
+     *
+     * @param key   key
+     * @param value value
+     *
+     * @return Long
+     */
+    public Long lLeftPushObjectIfPresent(String key, Object value) {
+        return redisTemplate.opsForList().leftPushIfPresent(key, value);
+    }
+
+    /**
      * 如果pivot存在,再pivot前面添加
      *
      * @param key   key
@@ -622,6 +742,19 @@ public class RedisUtils {
      * @return Long
      */
     public Long lLeftPush(String key, String pivot, String value) {
+        return redisTemplate.opsForList().leftPush(key, pivot, value);
+    }
+
+    /**
+     * 如果pivot存在,再pivot前面添加
+     *
+     * @param key   key
+     * @param pivot pivot
+     * @param value value
+     *
+     * @return Long
+     */
+    public Long lLeftPushObject(String key, Object pivot, Object value) {
         return redisTemplate.opsForList().leftPush(key, pivot, value);
     }
 
@@ -641,10 +774,29 @@ public class RedisUtils {
      *
      * @return Long
      */
+    public Long lRightPushObject(String key, Object value) {
+        return redisTemplate.opsForList().rightPush(key, value);
+    }
+
+    /**
+     * @param key   key
+     * @param value value
+     *
+     * @return Long
+     */
     public Long lRightPushAll(String key, String... value) {
         return redisTemplate.opsForList().rightPushAll(key, value);
     }
 
+    /**
+     * @param key   key
+     * @param value value
+     *
+     * @return Long
+     */
+    public Long lRightPushAllObject(String key, Object... value) {
+        return redisTemplate.opsForList().rightPushAll(key, value);
+    }
     /**
      * @param key   key
      * @param value value
@@ -668,6 +820,17 @@ public class RedisUtils {
     }
 
     /**
+     * 为已存在的列表添加值
+     *
+     * @param key   key
+     * @param value value
+     *
+     * @return Long
+     */
+    public Long lRightPushObjectIfPresent(String key, Object value) {
+        return redisTemplate.opsForList().rightPushIfPresent(key, value);
+    }
+    /**
      * 在pivot元素的右边添加值
      *
      * @param key   key
@@ -681,6 +844,19 @@ public class RedisUtils {
      }
 
     /**
+     * 在pivot元素的右边添加值
+     *
+     * @param key   key
+     * @param pivot pivot
+     * @param value value
+     *
+     * @return Long
+     */
+    public Long lRightPush(String key, Object pivot, Object value) {
+        return redisTemplate.opsForList().rightPush(key, pivot, value);
+    }
+
+    /**
      * 通过索引设置列表元素的值
      *
      * @param key   key
@@ -691,6 +867,16 @@ public class RedisUtils {
         redisTemplate.opsForList().set(key, index, value);
     }
 
+    /**
+     * 通过索引设置列表元素的值
+     *
+     * @param key   key
+     * @param index 位置
+     * @param value value
+     */
+    public void lSetObject(String key, long index, Object value) {
+        redisTemplate.opsForList().set(key, index, value);
+    }
     /**
      * 移出并获取列表的第一个元素
      *
@@ -781,6 +967,20 @@ public class RedisUtils {
     }
 
     /**
+     * 删除集合中值等于value得元素
+     *
+     * @param key   key
+     * @param index index=0, 删除所有值等于value的元素; index大于0, 从头部开始删除第一个值等于value的元素;
+     *              index小于0, 从尾部开始删除第一个值等于value的元素;
+     * @param value value
+     *
+     * @return Long
+     */
+    public Long lRemoveObject(String key, long index, Object value) {
+        return redisTemplate.opsForList().remove(key, index, value);
+    }
+
+    /**
      * 裁剪list
      *
      * @param key   key
@@ -817,6 +1017,18 @@ public class RedisUtils {
      }
 
     /**
+     * set添加元素
+     *
+     * @param key    key
+     * @param values values
+     *
+     * @return Long
+     */
+    public Long sAddObject(String key, Object... values) {
+        return redisTemplate.opsForSet().add(key, values);
+    }
+
+    /**
      * set移除元素
      *
      * @param key    key
@@ -849,6 +1061,19 @@ public class RedisUtils {
      * @return Boolean
      */
     public Boolean sMove(String key, String value, String destKey) {
+        return redisTemplate.opsForSet().move(key, value, destKey);
+    }
+
+    /**
+     * 将元素value从一个集合移到另一个集合
+     *
+     * @param key     key
+     * @param value   value
+     * @param destKey destKey
+     *
+     * @return Boolean
+     */
+    public Boolean sMoveObject(String key, Object value, String destKey) {
         return redisTemplate.opsForSet().move(key, value, destKey);
     }
 
@@ -1107,6 +1332,16 @@ public class RedisUtils {
     }
 
     /**
+     * @param key    key
+     * @param values values
+     *
+     * @return Long
+     */
+    public Long zAddObject(String key, Set<ZSetOperations.TypedTuple<Object>> values) {
+        return redisTemplate.opsForZSet().add(key, values);
+    }
+
+    /**
     * @param key    key
     * @param values values
     *
@@ -1127,6 +1362,19 @@ public class RedisUtils {
     */
     public Double zIncrementScore(String key, String value, double delta) {
        return redisTemplate.opsForZSet().incrementScore(key, value, delta);
+    }
+
+    /**
+     * 增加元素的score值，并返回增加后的值
+     *
+     * @param key   key
+     * @param value value
+     * @param delta delta
+     *
+     * @return Double
+     */
+    public Double zIncrementScoreObject(String key, Object value, double delta) {
+        return redisTemplate.opsForZSet().incrementScore(key, value, delta);
     }
 
     /**
