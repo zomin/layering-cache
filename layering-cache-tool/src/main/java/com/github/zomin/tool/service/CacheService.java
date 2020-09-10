@@ -34,7 +34,9 @@ public class CacheService {
         if (StringUtils.isBlank(cacheName) || StringUtils.isBlank(internalKey)) {
             return;
         }
-        LayeringCacheSetting defaultSetting = new LayeringCacheSetting(new FirstCacheSetting(), new SecondaryCacheSetting(), "默认缓存配置（删除时生成）");
+        LayeringCacheSetting defaultSetting = new LayeringCacheSetting(new FirstCacheSetting(),
+                                                                       new SecondaryCacheSetting(false),
+                                                                       "默认缓存配置（删除时生成）");
         Set<AbstractCacheManager> cacheManagers = AbstractCacheManager.getCacheManager();
         if (StringUtils.isBlank(key)) {
             // 清空缓存
@@ -49,7 +51,7 @@ public class CacheService {
                 if (CollectionUtils.isEmpty(caches)) {
                     // 如果没有找到Cache就新建一个默认的
                     Cache cache = cacheManager.getCache(cacheName, defaultSetting);
-                    cache.clear();
+                    cache.evict(cacheName);
                     if(cacheManager.getStats()) {
                         // 删除统计信息
                         redisKey = StatsService.CACHE_STATS_KEY_PREFIX + cacheName + defaultSetting.getInternalKey();

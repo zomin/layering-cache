@@ -47,15 +47,15 @@ public class LayeringCacheUtils {
         if(ObjectUtils.isEmpty(secondaryCacheSetting)){
             secondaryCacheSetting =new SecondaryCacheSetting();
         }
+        LayeringCacheSetting layeringCacheSetting = new LayeringCacheSetting(firstCacheSetting, secondaryCacheSetting, depict);
         try {
-            LayeringCacheSetting layeringCacheSetting = new LayeringCacheSetting(firstCacheSetting, secondaryCacheSetting, depict);
             // 执行查询缓存方法
             return executeGet(cacheName, key,layeringCacheSetting);
         } catch (SerializationException e) {
             // 如果是序列化异常需要先删除原有缓存
             String[] cacheNames = new String[]{cacheName};
             // 删除缓存
-            delete(cacheNames, key);
+            delete(cacheNames, key, layeringCacheSetting);
             log.warn(e.getMessage(), e);
             throw e;
         } catch (Exception e) {
@@ -87,10 +87,13 @@ public class LayeringCacheUtils {
      * @param key 缓存key，支持SpEL表达式
      * @param removeAll 是否删除缓存中所有数据
      */
-    public void removeCache(String[] cacheNames, String key, Boolean removeAll) {
+    public void removeCache(String[] cacheNames, String key, Boolean removeAll, String depict,
+                            FirstCacheSetting firstCacheSetting,
+                            SecondaryCacheSetting secondaryCacheSetting) {
         try {
+            LayeringCacheSetting layeringCacheSetting = new LayeringCacheSetting(firstCacheSetting, secondaryCacheSetting, depict);
             // 执行查询缓存方法
-            executeRemove(cacheNames,key,removeAll);
+            executeRemove(cacheNames,key,removeAll,layeringCacheSetting);
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
             throw e;
@@ -104,7 +107,8 @@ public class LayeringCacheUtils {
      * @param key 缓存key，支持SpEL表达式
      * @param removeAll 是否删除缓存中所有数据
      */
-    private void executeRemove(String[] cacheNames, String key, Boolean removeAll) {
+    private void executeRemove(String[] cacheNames, String key, Boolean removeAll,
+                               LayeringCacheSetting layeringCacheSetting) {
         // 判断是否删除所有缓存数据
         if (removeAll) {
             // 删除所有缓存数据（清空）
@@ -112,8 +116,7 @@ public class LayeringCacheUtils {
                 Collection<Cache> caches = layerCacheManager.getCache(cacheName);
                 if (CollectionUtils.isEmpty(caches)) {
                     // 如果没有找到Cache就新建一个默认的
-                    Cache cache = layerCacheManager.getCache(cacheName,
-                                                        new LayeringCacheSetting(new FirstCacheSetting(), new SecondaryCacheSetting(), "默认缓存配置（清除时生成）"));
+                    Cache cache = layerCacheManager.getCache(cacheName, layeringCacheSetting);
                     cache.clear();
                 } else {
                     for (Cache cache : caches) {
@@ -123,7 +126,7 @@ public class LayeringCacheUtils {
             }
         } else {
             // 删除指定key
-            delete(cacheNames, key);
+            delete(cacheNames, key, layeringCacheSetting);
         }
     }
 
@@ -132,13 +135,12 @@ public class LayeringCacheUtils {
      *
      * @param cacheNames 缓存名称
      */
-    private void delete(String[] cacheNames, String key) {
+    private void delete(String[] cacheNames, String key, LayeringCacheSetting layeringCacheSetting) {
         for (String cacheName : cacheNames) {
             Collection<Cache> caches = layerCacheManager.getCache(cacheName);
             if (CollectionUtils.isEmpty(caches)) {
                 // 如果没有找到Cache就新建一个默认的
-                Cache cache = layerCacheManager.getCache(cacheName,
-                                                    new LayeringCacheSetting(new FirstCacheSetting(), new SecondaryCacheSetting(), "默认缓存配置（删除时生成）"));
+                Cache cache = layerCacheManager.getCache(cacheName, layeringCacheSetting);
                 cache.evict(key);
             } else {
                 for (Cache cache : caches) {
