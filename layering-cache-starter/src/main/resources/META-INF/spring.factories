@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.xiaolyuh.cache.config.LayeringCacheAutoConfig
+    com.github.zomin.cache.config.RedisAutoConfig,\
+    com.github.zomin.cache.config.LayeringCacheAutoConfig
