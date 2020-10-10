@@ -1695,6 +1695,25 @@ public class RedisUtils {
     }
 
     /**
+     * unlink
+     * @param key key
+     * @return boolean
+     */
+    public boolean unlink(Object key){
+        return redisTemplate.unlink(key);
+    }
+
+    /**
+     * unlink
+     *
+     * @param keys keys
+     * @return long
+     */
+    public long unlink(Collection<Object> keys) {
+        return redisTemplate.unlink(keys);
+    }
+
+    /**
      * runLua 执行lua脚本
      *
      * @param fileClasspath lua脚本Classpath 与 application.properties
